@@ -19,21 +19,19 @@
 
 (defun cider-show-def-handler (buf)
   (interactive)
-  (when (and (buffer-live-p buf) (eq (window-buffer) buf))
-    (with-current-buffer buf
-      (if-let* ((info (cider-var-info (thing-at-point 'symbol))))
-	  (progn
-	    (let ((show-def-buffer (cider--find-buffer-for-file (nrepl-dict-get info "file")))
-		  (sw (selected-window))
-		  (this-scroll-margin
-		   (min (max 0 scroll-margin)
-			(truncate (/ (window-body-height) 4.0)))))
-	      (setq cider-show-def-window (display-buffer-in-side-window show-def-buffer '()))
-	      (select-window cider-show-def-window)
-	      (with-no-warnings
-		(goto-line (nrepl-dict-get info "line")))
-	      (recenter-top-bottom this-scroll-margin)
-	      (select-window sw)))))))
+  (if-let* ((info (cider-var-info (thing-at-point 'symbol))))
+      (progn
+	(let ((show-def-buffer (cider--find-buffer-for-file (nrepl-dict-get info "file")))
+	      (sw (selected-window))
+	      (this-scroll-margin
+	       (min (max 0 scroll-margin)
+		    (truncate (/ (window-body-height) 4.0)))))
+	  (setq cider-show-def-window (display-buffer-in-side-window show-def-buffer '()))
+	  (select-window cider-show-def-window)
+	  (with-no-warnings
+	    (goto-line (nrepl-dict-get info "line")))
+	  (recenter-top-bottom this-scroll-margin)
+	  (select-window sw)))))
 
 (defun cancel-cider-show-def-timer ()
   (when cider-show-def-timer
