@@ -59,7 +59,7 @@
 	(update-cider-show-def-timer 0.5))
     (remove-hook 'post-command-hook 'cider-show-def-command-hook-handler)
     (delete-cider-show-def-window)
-    (cancel-show-def-timer)))
+    (cancel-cider-show-def-timer)))
 
 (provide 'cider-show-def)
 ;; Local Variables:
