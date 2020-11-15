@@ -19,19 +19,23 @@
 
 (defun cider-show-def-handler (buf)
   (interactive)
-  (if-let* ((info (cider-var-info (thing-at-point 'symbol))))
-      (progn
-	(let ((show-def-buffer (cider--find-buffer-for-file (nrepl-dict-get info "file")))
-	      (sw (selected-window))
-	      (this-scroll-margin
-	       (min (max 0 scroll-margin)
-		    (truncate (/ (window-body-height) 4.0)))))
-	  (setq cider-show-def-window (display-buffer-in-side-window show-def-buffer '()))
-	  (select-window cider-show-def-window)
-	  (with-no-warnings
-	    (goto-line (nrepl-dict-get info "line")))
-	  (recenter-top-bottom this-scroll-margin)
-	  (select-window sw)))))
+  (if (cider-connected-p)
+      (if-let* ((info (cider-var-info (thing-at-point 'symbol))))
+	  (if-let* ((file (nrepl-dict-get info "file")))
+	      (progn
+		(let ((show-def-buffer (cider--find-buffer-for-file file))
+		      (sw (selected-window))
+		      (this-scroll-margin
+		       (min (max 0 scroll-margin)
+			    (truncate (/ (window-body-height) 4.0)))))
+		  (setq cider-show-def-window (display-buffer-in-side-window show-def-buffer '()))
+		  (select-window cider-show-def-window)
+		  (with-no-warnings
+		    (goto-line (nrepl-dict-get info "line")))
+		  (recenter-top-bottom this-scroll-margin)
+		  (select-window sw)
+		  ))))
+    (message "Cider is not connected")))
 
 (defun cancel-cider-show-def-timer ()
   (when cider-show-def-timer
@@ -53,9 +57,9 @@
   nil " SD" (make-sparse-keymap)
   (if cider-show-def-mode
       (progn
-	(add-hook 'post-command-hook 'cider-show-def-command-hook-handler)
+	(add-hook 'pre-command-hook 'cider-show-def-command-hook-handler)
 	(update-cider-show-def-timer 0.5))
-    (remove-hook 'post-command-hook 'cider-show-def-command-hook-handler)
+    (remove-hook 'pre-command-hook 'cider-show-def-command-hook-handler)
     (delete-cider-show-def-window)
     (cancel-cider-show-def-timer)))
 
