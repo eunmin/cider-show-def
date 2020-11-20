@@ -6,6 +6,7 @@
 
 (require 'cider-common)
 (require 'cider-client)
+(require 'cider-util)
 (require 'nrepl-dict)
 
 (defvar cider-show-def-timer nil)
@@ -20,7 +21,7 @@
 (defun cider-show-def-handler (buf)
   (interactive)
   (if (cider-connected-p)
-      (if-let* ((info (cider-var-info (thing-at-point 'symbol))))
+      (if-let* ((info (cider-var-info (cider-symbol-at-point))))
 	  (if-let* ((file (nrepl-dict-get info "file")))
 	      (progn
 		(let ((show-def-buffer (cider--find-buffer-for-file file))
