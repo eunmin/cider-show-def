@@ -21,7 +21,7 @@
 (defun cider-show-def-handler (buf)
   (interactive)
   (if (cider-connected-p)
-      (if-let* ((info (cider-var-info (cider-symbol-at-point))))
+      (if-let* ((info (cider-var-info (cider-symbol-at-point) t)))
 	  (if-let* ((file (nrepl-dict-get info "file")))
 	      (progn
 		(let ((show-def-buffer (cider--find-buffer-for-file file))
@@ -53,9 +53,11 @@
 (defun cider-show-def-command-hook-handler ()
   (delete-cider-show-def-window))
 
+;; ------ minor mode -----------
+;;;###autoload
 (define-minor-mode cider-show-def-mode
   "Minor mode for show cider definition symbol at point."
-  nil " SD" (make-sparse-keymap)
+  nil " csd" (make-sparse-keymap)
   (if cider-show-def-mode
       (progn
 	(add-hook 'pre-command-hook 'cider-show-def-command-hook-handler)
